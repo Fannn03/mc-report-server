@@ -28,7 +28,12 @@ function bytesToSize(bytes) {
 const getServer = async () => {
   try {
     const getInformation = await axios.get(
-      `https://api.mcstatus.io/v2/status/bedrock/${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`
+      `https://api.mcstatus.io/v2/status/bedrock/${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "application/json"
+        }
+      }
     );
 
     const getServerDetail = await axios.get(
@@ -36,6 +41,8 @@ const getServer = async () => {
       {
         headers: {
           Authorization: `Bearer ${process.env.SERVER_AUTH}`,
+          "User-Agent": "Mozilla/5.0",
+          "Accept": "application/json"
         },
       }
     );
@@ -110,6 +117,7 @@ ${
 };
 
 client.on("join", () => {
+  console.log("HOST:", process.env.SERVER_HOST);
   console.log("✅ Bot joined the server!");
 
   try {
