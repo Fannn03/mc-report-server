@@ -104,6 +104,7 @@ ${
 
     console.log("✅ success update server at", moment().format("HH:mm:ss"));
   } catch (err) {
+    console.log(err)
     console.error("❌ Error getServer:", err.message);
   }
 };
