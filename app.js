@@ -66,7 +66,7 @@ Network  : ↓ ${netRx} ↑ ${netTx}
 ======================
 
 Online players : ${
-      playerList.length === 0 ? "0" : playerList.length - 1
+      playerList.length === 0 ? "0" : playerList.length
     }/${getInformation.data.players.max}
 
 ${
