@@ -30,8 +30,11 @@ const getServer = async () => {
     const getInformation = await axios.get(
       `https://api.mcstatus.io/v2/status/bedrock/${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`, {
         headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "application/json"
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+          "Accept": "application/json",
+          "Sec-CH-UA": '"Chromium";v="117", "Not)A;Brand";v="24", "Google Chrome";v="117"',
+          "Sec-CH-UA-Platform": '"Windows"',
+          "Sec-CH-UA-Mobile": "?0"
         }
       }
     );
@@ -41,8 +44,11 @@ const getServer = async () => {
       {
         headers: {
           Authorization: `Bearer ${process.env.SERVER_AUTH}`,
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "application/json"
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+          "Accept": "application/json",
+          "Sec-CH-UA": '"Chromium";v="117", "Not)A;Brand";v="24", "Google Chrome";v="117"',
+          "Sec-CH-UA-Platform": '"Windows"',
+          "Sec-CH-UA-Mobile": "?0"
         },
       }
     );
