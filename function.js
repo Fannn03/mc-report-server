@@ -1,6 +1,8 @@
 import axios from "axios";
 import 'dotenv/config';
 import moment from "moment";
+import fs from 'fs';
+import FormData from "form-data";
 
 moment().locale('id');
 
@@ -121,3 +123,57 @@ export const getServer = async (playerList) => {
     console.error("❌ Error getServer:", err.message);
   }
 };
+
+
+export const backupServer = async () => {
+  const getListBackup = await axios.get(`${process.env.SERVER_ENDPOINT}/api/client/servers/${process.env.SERVER_ID}/backups`, {
+    headers: {
+      Authorization: `Bearer ${process.env.SERVER_AUTH}`,
+      'Accept': 'Application/vnd.pterodactyl.v1+json',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const getBackupData = getListBackup.data.data[getListBackup.data.data.length - 1];
+
+  const getBackupDownload = await axios.get(`${process.env.SERVER_ENDPOINT}/api/client/servers/${process.env.SERVER_ID}/backups/${getBackupData.attributes.uuid}/download`, {
+    headers: {
+      Authorization: `Bearer ${process.env.SERVER_AUTH}`,
+      'Accept': 'Application/vnd.pterodactyl.v1+json',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const downloadFile = await axios.get(getBackupDownload.data.attributes.url, {
+    responseType: 'stream'
+  })
+
+  downloadFile.data.pipe(fs.createWriteStream('backup.tar.gz'));
+
+  downloadFile.data.on('finish', async () => {
+    const form = new FormData();
+
+    let embedText = `
+    Uuid : ${getBackupData.attributes.uuid}
+    Name : ${getBackupData.attributes.name}
+    Checksum : ${getBackupData.attributes.checksum}
+    Size : ${bytesToSize(getBackupData.attributes.bytes)}
+    `
+
+    form.append('payload_json', JSON.stringify({
+      content: embedText,
+      attachments: [
+        {
+          id: 0,
+          filename: `${getBackupData.attributes.name}.tar.gz`
+        }
+      ]
+    }))
+
+    form.append('files[0]', fs.createReadStream('./backup.tar.gz'))
+
+    await axios.post(process.env.WEBHOOK_BACKUP_LOG, form, {
+      headers: form.getHeaders()
+    })
+  })
+}

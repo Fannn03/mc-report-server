@@ -3,7 +3,7 @@ import moment from "moment";
 import { CronJob } from "cron";
 import { createClient } from "bedrock-protocol";
 import "dotenv/config";
-import { getServer } from "./function.js";
+import { backupServer, getServer } from "./function.js";
 
 moment().locale("id");
 
@@ -21,7 +21,7 @@ if(process.env.BOT_LOG) {
   });
 } else {
   try {
-    new CronJob(process.env.CRON_TIME, getServer, null, true, "Asia/Jakarta");
+    new CronJob(process.env.CRON_REPORT, getServer, null, true, "Asia/Jakarta");
     console.log("⏱️ Job Started ");
   } catch (err) {
     console.error("Cron error:", err);
@@ -32,7 +32,7 @@ if (client) client.on("join", () => {
   console.log("✅ Bot joined the server!");
 
   try {
-    new CronJob("*/30 * * * * *", () => getServer(playerList), null, true, "Asia/Jakarta");
+    new CronJob(process.env.CRON_REPORT, () => getServer(playerList), null, true, "Asia/Jakarta");
     console.log("⏱️ Job Started");
   } catch (err) {
     console.error("Cron error:", err);
@@ -79,3 +79,5 @@ if (client) client.on("join", () => {
     }
   });
 });
+
+new CronJob(process.env.CRON_BACKUP, backupServer, null, true, 'Asia/Jakarta');
