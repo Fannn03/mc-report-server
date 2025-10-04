@@ -11,8 +11,8 @@ let playerList = [];
 let botlog = false;
 let client;
 
-if(process.env.BOT_LOG == false) {
-  botlog = false;
+if(process.env.BOT_LOG == true) {
+  botlog = true;
 
   client = createClient({
     host: process.env.SERVER_HOST,
