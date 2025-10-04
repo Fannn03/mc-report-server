@@ -77,8 +77,6 @@ export const getServer = async (playerList) => {
       }
     );
 
-    console.log(getServerDetail.data)
-
     const resources = getServerDetail.data.attributes.resources;
     const memory = bytesToSize(resources.memory_bytes);
     const disk = bytesToSize(resources.disk_bytes);
