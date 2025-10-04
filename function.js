@@ -169,7 +169,7 @@ export const backupServer = async () => {
   form.append('caption', embedText);
   form.append('document', fs.createReadStream('./backup.tar.gz'))
 
-  await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT}`, form, {
+  await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT}`, form, {
     headers: form.getHeaders()
   })
 }
