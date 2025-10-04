@@ -150,7 +150,7 @@ export const backupServer = async () => {
   })
 
   await pipeline(
-    downloadFile.file,
+    downloadFile.data,
     fs.createWriteStream('backup.tar.gz')
   )
 
@@ -165,19 +165,11 @@ export const backupServer = async () => {
   Size : ${bytesToSize(getBackupData.attributes.bytes)}
   `
 
-  form.append('payload_json', JSON.stringify({
-    content: embedText,
-    attachments: [
-      {
-        id: 0,
-        filename: `${getBackupData.attributes.name}.tar.gz`
-      }
-    ]
-  }))
+  form.append('chat_id', process.env.TELEGRAM_CHAT_ID)
+  form.append('caption', embedText);
+  form.append('document', fs.createReadStream('./backup.tar.gz'))
 
-  form.append('files[0]', fs.createReadStream('./backup.tar.gz'))
-
-  await axios.post(process.env.WEBHOOK_BACKUP_LOG, form, {
+  await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT}`, form, {
     headers: form.getHeaders()
-    })
+  })
 }
