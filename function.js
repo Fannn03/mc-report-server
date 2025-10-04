@@ -3,6 +3,7 @@ import 'dotenv/config';
 import moment from "moment";
 import fs from 'fs';
 import FormData from "form-data";
+import { pipeline } from "stream/promises";
 
 moment().locale('id');
 
@@ -148,32 +149,35 @@ export const backupServer = async () => {
     responseType: 'stream'
   })
 
-  downloadFile.data.pipe(fs.createWriteStream('backup.tar.gz'));
+  await pipeline(
+    downloadFile.file,
+    fs.createWriteStream('backup.tar.gz')
+  )
 
-  downloadFile.data.on('finish', async () => {
-    const form = new FormData();
+  console.log('Download backup completed')
 
-    let embedText = `
-    Uuid : ${getBackupData.attributes.uuid}
-    Name : ${getBackupData.attributes.name}
-    Checksum : ${getBackupData.attributes.checksum}
-    Size : ${bytesToSize(getBackupData.attributes.bytes)}
-    `
+  const form = new FormData();
 
-    form.append('payload_json', JSON.stringify({
-      content: embedText,
-      attachments: [
-        {
-          id: 0,
-          filename: `${getBackupData.attributes.name}.tar.gz`
-        }
-      ]
-    }))
+  let embedText = `
+  Uuid : ${getBackupData.attributes.uuid}
+  Name : ${getBackupData.attributes.name}
+  Checksum : ${getBackupData.attributes.checksum}
+  Size : ${bytesToSize(getBackupData.attributes.bytes)}
+  `
 
-    form.append('files[0]', fs.createReadStream('./backup.tar.gz'))
+  form.append('payload_json', JSON.stringify({
+    content: embedText,
+    attachments: [
+      {
+        id: 0,
+        filename: `${getBackupData.attributes.name}.tar.gz`
+      }
+    ]
+  }))
 
-    await axios.post(process.env.WEBHOOK_BACKUP_LOG, form, {
-      headers: form.getHeaders()
+  form.append('files[0]', fs.createReadStream('./backup.tar.gz'))
+
+  await axios.post(process.env.WEBHOOK_BACKUP_LOG, form, {
+    headers: form.getHeaders()
     })
-  })
 }
